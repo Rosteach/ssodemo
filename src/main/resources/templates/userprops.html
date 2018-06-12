@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>User properties page</title>
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="/material/mdl-spinner.min.css"
+	th:href="@{/material/mdl-spinner.min.css}" />
+<link rel="stylesheet" href="/material/material.min.css"
+	th:href="@{/material/material.min.css}" />
+<link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+
+<script src="/webjars/jquery/3.2.1/dist/jquery.min.js"></script>
+<script src="/js/jquery.cookie.js"></script>
+<script src="/material/material.min.js"></script>
+</head>
+<body>
+	<button id="add" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" th:attrappend="userid=${users.id}">
+  		<i class="material-icons">add</i>
+	</button>
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title" th:inline="text"><strong>[[${users.username}]]</strong> properties</span>
+
+				<!-- Add spacer, to align navigation to the right -->
+				<div class="mdl-layout-spacer"></div>
+				<!-- Navigation. We hide it in small screens. -->
+				<nav class="mdl-navigation mdl-layout--large-screen-only">
+					<span class="mdl-navigation__link" sec:authorize="isAuthenticated()" th:inline="text">Logged in user: <strong>[[${#authentication.name}]]</strong></span> 
+					<span class="mdl-navigation__link" sec:authorize="isAuthenticated()" th:inline="text">Roles: <strong>[[${#authentication.principal.authorities}]]</strong></span>
+					<a class="mdl-navigation__link" sec:authorize="isAuthenticated()" href="/users" th:href="@{/users}">Users Management</a>
+					<a id="logout-btn" style="cursor: pointer;" class="mdl-navigation__link" sec:authorize="isAuthenticated()">Log Out</a>
+				</nav>
+			</div>
+		</header>
+		<form id="logout" action="/logout" th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+		<div class="mdl-layout__content">
+			<dialog id="create-dialog" class="mdl-dialog">
+			    <h4 class="mdl-dialog__title">Create new property</h4>
+			    <div class="mdl-dialog__content">
+					<div class="mdl-textfield mdl-js-textfield">
+					    <input class="mdl-textfield__input" type="text" id="create-prop-name">
+					    <label class="mdl-textfield__label" for="create-prop-name">Name</label>
+					</div>
+					<div class="mdl-textfield mdl-js-textfield">
+					    <input class="mdl-textfield__input" type="text" id="create-prop-value">
+					    <label class="mdl-textfield__label" for="create-prop-value">Value</label>
+					</div>
+			    </div>
+			    <div class="mdl-dialog__actions">
+			    	<button type="button" class="mdl-button mdl-button--accent close">close</button>
+			      	<button type="button" class="mdl-button mdl-button--colored prop-create">create</button>
+			    </div>
+			</dialog>
+			<dialog id="update-dialog" class="mdl-dialog">
+			    <h4 class="mdl-dialog__title">Update property</h4>
+			    <div class="mdl-dialog__content">
+					<div class="mdl-textfield mdl-js-textfield">
+					    <input class="mdl-textfield__input" type="text" id="update-prop-name">
+					</div>
+					<div class="mdl-textfield mdl-js-textfield">
+					    <input class="mdl-textfield__input" type="text" id="update-prop-value">
+					</div>
+			    </div>
+			    <div class="mdl-dialog__actions">
+			    	<button type="button" class="mdl-button mdl-button--accent close">close</button>
+			      	<button type="button" class="mdl-button mdl-button--colored prop-update">update</button>
+			    </div>
+			</dialog>
+			<div class="page-content">
+				<h5 th:if="${userprops==null or userprops.size() == 0}">User has no properties yet!</h5>
+				<div class="demo-card-wide mdl-card mdl-shadow--2dp" th:each="prop : ${userprops}">
+					<div class="mdl-card__title">
+						<h4 class="mdl-card__title-text" >Property name: </h4>
+						<p class="mdl-card__title-text prop-name" th:inline="text">[[${prop.name}]]</p>
+					</div>
+					<div class="mdl-card__supporting-text" >
+						<h5 class="mdl-card__title-text" >value: </h5>
+						<p class="prop-val" th:inline="text">[[${prop.value}]]</p>
+					</div>
+					<div class="mdl-card__actions mdl-card--border">
+						<a class="update mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" th:attrappend="userid=${users.id},propid=${prop.id}">Update</a>
+						<a class="delete mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect" th:attrappend="userid=${users.id},propid=${prop.id}">Delete</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		$(function(){
+			// imitate logout button submitting
+			$("#logout-btn").on("click", function(e) {
+				e.preventDefault(); // cancel the link itself
+				$("#logout").submit();
+			});
+			
+			// ajax call on user prop create operation
+			function createProp(uId){
+				var postData = JSON.stringify({
+					name : $('#create-prop-name').val(),
+					value : $('#create-prop-value').val()	
+				});
+				$.ajax({
+					url : location.origin.concat('/api/users/').concat(uId).concat('/properties'),
+					contentType : 'application/json',
+					method : 'POST',
+					data: postData
+				}).done(function(data) {
+					location.reload();
+				}).fail(function(data) {
+					console.log(data);
+				});
+			}
+			
+			// ajax call on user prop update operation
+			$('.prop-update').click(function(){
+				var putData = JSON.stringify({
+					name : $('#update-prop-name').val(),
+					value : $('#update-prop-value').val()	
+				});
+				$.ajax({
+					url : location.origin.concat('/api/users/').concat($(this).attr('userid')).concat('/properties/').concat($(this).attr('propid')),
+					contentType : 'application/json',
+					method : 'PUT',
+					data: putData
+				}).done(function(data) {
+					location.reload();
+				}).fail(function(data) {
+					console.log(data);
+				});
+			});
+			
+			// ajax call on user prop delete operation
+			$('.delete').click(function(){
+				$.ajax({
+					url : location.origin.concat('/api/users/').concat($(this).attr('userid')).concat('/properties/').concat($(this).attr('propid')),
+					contentType : 'application/json',
+					method : 'DELETE'
+				}).done(function(data) {
+					location.reload();
+				}).fail(function(data) {
+					console.log(data);
+				});
+			});
+			
+			//create dialog config
+			var cDialog = document.querySelector('#create-dialog');
+			var showCDialog = document.querySelector('#add');
+		    if (!cDialog.showModal) {
+		    	dialogPolyfill.registerDialog(cDialog);
+		    }
+		    showCDialog.addEventListener('click', function() {
+		    	cDialog.showModal();
+		    	cDialog.querySelector('.prop-create').setAttribute('userid',showCDialog.getAttribute('userid'));
+		    });
+		    cDialog.querySelector('.close').addEventListener('click', function() {
+		    	cDialog.close();
+		    });
+		    
+		    cDialog.querySelector('.prop-create').addEventListener('click', function(e) {
+		    	createProp(cDialog.querySelector('.prop-create').getAttribute('userid'));
+		    });
+		    
+		    //update dialog config
+		    var uDialog = document.querySelector('#update-dialog');
+		    if (!uDialog.showModal) {
+		    	dialogPolyfill.registerDialog(uDialog);
+		    }
+		    $('.update').click(function(){
+		    	uDialog.showModal();
+		    	uDialog.querySelector('.prop-update').setAttribute('userid',$(this).attr('userid'));
+		    	uDialog.querySelector('.prop-update').setAttribute('propid',$(this).attr('propid'));
+		    	var parent = $(this).parent().parent();
+		    	$('#update-prop-name').val(parent.find('.prop-name').text());
+				$('#update-prop-value').val(parent.find('.prop-val').text());
+		    })
+		    uDialog.querySelector('.close').addEventListener('click', function() {
+		    	uDialog.close();
+		    });
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>Error page</title>
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="/material/mdl-spinner.min.css"
+	th:href="@{/material/mdl-spinner.min.css}" />
+<link rel="stylesheet" href="/material/material.min.css"
+	th:href="@{/material/material.min.css}" />
+<link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+
+<script src="/webjars/jquery/3.2.1/dist/jquery.min.js"></script>
+<script src="/material/material.min.js"></script>
+</head>
+<body>
+	<dialog id="dialog" class="mdl-dialog">
+		<h4 class="mdl-dialog__title" th:text="${status}"></h4>
+		<div class="mdl-dialog__content">
+			<p th:text="${error}"></p>
+			<p th:text="${message}"></p>
+			<p th:text="${timestamp}"></p>
+		</div>
+		<div class="mdl-dialog__actions">
+			<a type="button" class="mdl-button" href="/" th:href="@{/}">Back</a>
+		</div>
+	</dialog>
+</body>
+
+<script>
+	var dialog = document.querySelector('dialog');
+	if (!dialog.showModal) {
+		dialogPolyfill.registerDialog(dialog);
+	}
+	dialog.showModal();
+</script>
+</html>

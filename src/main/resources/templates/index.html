@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>Home page</title>
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="/material/mdl-spinner.min.css"
+	th:href="@{/material/mdl-spinner.min.css}" />
+<link rel="stylesheet" href="/material/material.min.css"
+	th:href="@{/material/material.min.css}" />
+<link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+
+<script src="/webjars/jquery/3.2.1/dist/jquery.min.js"></script>
+<script src="/material/material.min.js"></script>
+</head>
+<body>
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title" sec:authorize="isAnonymous()">Spring
+					Boot SSO</span> <span class="mdl-navigation__link"
+					sec:authorize="isAuthenticated()" th:inline="text">Logged in
+					user: <strong>[[${#authentication.name}]]</strong>
+				</span> <span class="mdl-navigation__link"
+					sec:authorize="isAuthenticated()" th:inline="text">Roles: <strong>[[${#authentication.principal.authorities}]]</strong></span>
+				<!-- Add spacer, to align navigation to the right -->
+				<div class="mdl-layout-spacer"></div>
+				<!-- Navigation. We hide it in small screens. -->
+				<nav class="mdl-navigation mdl-layout--large-screen-only">
+					<a class="mdl-navigation__link" sec:authorize="isAnonymous()" href="/users" th:href="@{/users}">Log In</a> 
+					<a class="mdl-navigation__link" sec:authorize="isAuthenticated()" href="/users" th:href="@{/users}">Users Management</a>
+					<a id="logout-btn" class="mdl-navigation__link" sec:authorize="isAuthenticated()">Log Out</a>
+				</nav>
+			</div>
+		</header>
+		<form id="logout" action="/logout" th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+		<div class="mdl-layout__content">
+			<div class="page-content">
+				<h4>Welcome to the SSO demo!</h4>
+				<h5>Issue scope</h5>
+				<h6>Provide basic security authentication using MySQL data
+					storage. Configure REST API to take control over CRUD operations
+					with specific user data.</h6>
+				<br>
+				<h5>Technical stack</h5>
+				<p>Spring: Boot, Security OAuth2, JPA with Hibernate, Thymeleaf</p>
+				<p>Front-end: JavaScript, JQuery, HTML/CSS, Material UI
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+	$(function() {
+		$("#logout-btn").on("click", function(e) {
+			e.preventDefault(); // cancel the link itself
+			$("#logout").submit();
+		});
+	});
+</script>
+</html>

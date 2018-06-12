@@ -1,0 +1,35 @@
+server:
+  port: 8080
+  url: https://localhost:${server.port}
+  error:
+    include-stacktrace: always
+spring:
+  jpa:
+    database: MYSQL
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    open-in-view: false
+    hibernate:
+      naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/oauth_2_demo?createDatabaseIfNotExist=true&useEncoding=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: root
+    driver-class-name: com.mysql.jdbc.Driver
+    max-active: 10
+    max-idle: 8
+    min-idle: 2
+    initial-size: 5
+    validation-query: SELECT 1
+    test-on-borrow: true
+    test-on-return: false
+    test-while-idle: true
+  thymeleaf:
+    cache: false
+    mode: LEGACYHTML5
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.security.oauth2: INFO

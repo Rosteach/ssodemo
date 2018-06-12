@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+<head lang="en">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<title>Users page</title>
+<link rel="stylesheet"
+	href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<link rel="stylesheet" href="/material/mdl-spinner.min.css"
+	th:href="@{/material/mdl-spinner.min.css}" />
+<link rel="stylesheet" href="/material/material.min.css"
+	th:href="@{/material/material.min.css}" />
+<link rel="stylesheet" href="/css/main.css" th:href="@{/css/main.css}" />
+
+<script src="/webjars/jquery/3.2.1/dist/jquery.min.js"></script>
+<script src="/js/jquery.cookie.js"></script>
+<script src="/material/material.min.js"></script>
+<script src="/js/users.js"></script>
+</head>
+<body>
+	<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+		<header class="mdl-layout__header">
+			<div class="mdl-layout__header-row">
+				<!-- Title -->
+				<span class="mdl-layout-title">Users management</span>
+
+				<!-- Add spacer, to align navigation to the right -->
+				<div class="mdl-layout-spacer"></div>
+				<!-- Navigation. We hide it in small screens. -->
+				<nav class="mdl-navigation mdl-layout--large-screen-only">
+					<span class="mdl-navigation__link"
+						sec:authorize="isAuthenticated()" th:inline="text">Logged
+						in user: <strong>[[${#authentication.name}]]</strong>
+					</span> <span class="mdl-navigation__link"
+						sec:authorize="isAuthenticated()" th:inline="text">Roles: <strong>[[${#authentication.principal.authorities}]]</strong></span>
+					<a id="logout-btn" style="cursor: pointer;" class="mdl-navigation__link" th:fragment="logout" sec:authorize="isAuthenticated()">Log Out</a>
+				</nav>
+			</div>
+		</header>
+		<form id="logout" action="/logout"
+			th:action="@{/logout}" method="post">
+			<input type="submit" value="Logout" />
+		</form>
+		<div class="mdl-layout__content">
+			<div class="page-content">
+				<div class="demo-card-wide mdl-card mdl-shadow--2dp" th:each="user : ${users}">
+					<div class="mdl-card__title">
+						<h2 class="mdl-card__title-text" th:text="${user.username}"></h2>
+					</div>
+					<div class="mdl-card__supporting-text" >
+						<strong>ROLES:</strong>
+						<p th:each="role : ${user.roles}" th:text="${role.role}"></p>
+					</div>
+					<div class="mdl-card__actions mdl-card--border">
+						<a class="user-props mdl-button mdl-js-button mdl-js-ripple-effect" th:href=@{/users/{id}/properties(id=${user.id})}>Properties</a>
+<!-- 						<a class="user-update mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect" th:attrappend="userid=${user.id}">Update</a> -->
+<!-- 						<a class="user-delete mdl-button mdl-button--accent mdl-js-button mdl-js-ripple-effect" th:attrappend="userid=${user.id}">Delete</a> -->
+					</div>
+					<div class="mdl-card__menu">
+					    <i class="material-icons" th:classappend="${user.active}?'green':'red'">fiber_manual_record</i>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<!-- 	<button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect add-btn"> -->
+<!--   		<i class="material-icons">add</i> -->
+<!-- 	</button> -->
+</body>
+</html>
